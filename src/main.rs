@@ -1,14 +1,14 @@
 pub mod assets;
-use std::{
-    net::{Ipv4Addr, SocketAddr},
-    sync::Arc,
-};
-
+mod entsoe;
 use axum::{
     routing::{self, get},
     Router, Server,
 };
 use hyper::Error;
+use std::{
+    net::{Ipv4Addr, SocketAddr},
+    sync::Arc,
+};
 use utoipa::{
     openapi::security::{ApiKey, ApiKeyValue, SecurityScheme},
     Modify, OpenApi,
@@ -19,10 +19,12 @@ use utoipa_swagger_ui::SwaggerUi;
 
 mod forecast {
     use crate::assets::AREA_CODE;
+    use crate::entsoe::day_ahead_load;
     use axum::extract::Path;
 
     pub async fn forecast(Path(area_code): Path<AREA_CODE>) -> String {
         print!("   Area Code: {:?}", area_code);
+        day_ahead_load(area_code).await;
         "Hello".to_string()
     }
 }

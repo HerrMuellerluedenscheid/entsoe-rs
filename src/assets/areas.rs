@@ -2,9 +2,9 @@ use phf::phf_map;
 use serde::{Deserialize, Serialize};
 
 pub struct Area {
-    code: &'static str,
-    meaning: &'static str,
-    timezone: &'static str,
+    pub code: &'static str,
+    pub meaning: &'static str,
+    pub timezone: &'static str,
 }
 
 #[derive(Hash, Eq, PartialEq, Serialize, Deserialize, Debug)]
@@ -14,13 +14,11 @@ pub enum AREA_CODE {
 
 pub fn get_area(area_key: AREA_CODE) -> Area {
     match area_key {
-        AREA_CODE::DE_50HZ => {
-            Area {
-                code: "a",
-                meaning: "a",
-                timezone: "a",
-            }
-        }
+        AREA_CODE::DE_50HZ => Area {
+            code: "10YDE-VE-------2",
+            meaning: "50Hertz CA, DE(50HzT) BZA",
+            timezone: "Europe/Berlin",
+        },
     }
 }
 
@@ -30,7 +28,7 @@ mod tests {
 
     #[test]
     fn test_areas() {
-        assert_eq!(get_area(AREA_CODE::DE_50HZ).code, "a");
+        assert_eq!(get_area(AREA_CODE::DE_50HZ).code, "10YDE-VE-------2");
     }
 }
 
@@ -39,7 +37,7 @@ mod tests {
 // """
 
 // # List taken directly from the API Docs
-// DE_50HZ =       '10YDE-VE-------2', '50Hertz CA, DE(50HzT) BZA',                    'Europe/Berlin',
+// DE_50HZ =       '', '50Hertz CA, DE(50HzT) BZA',                    'Europe/Berlin',
 // AL =            '10YAL-KESH-----5', 'Albania, OST BZ / CA / MBA',                   'Europe/Tirane',
 // DE_AMPRION =    '10YDE-RWENET---I', 'Amprion CA',                                   'Europe/Berlin',
 // AT =            '10YAT-APG------L', 'Austria, APG BZ / CA / MBA',                   'Europe/Vienna',
