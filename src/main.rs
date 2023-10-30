@@ -1,9 +1,13 @@
+pub mod assets;
 use std::{
     net::{Ipv4Addr, SocketAddr},
     sync::Arc,
 };
 
-use axum::{routing::{self, get}, Router, Server};
+use axum::{
+    routing::{self, get},
+    Router, Server,
+};
 use hyper::Error;
 use utoipa::{
     openapi::security::{ApiKey, ApiKeyValue, SecurityScheme},
@@ -13,9 +17,18 @@ use utoipa_rapidoc::RapiDoc;
 use utoipa_redoc::{Redoc, Servable};
 use utoipa_swagger_ui::SwaggerUi;
 
+mod forecast {
+    use crate::assets::AREA_CODE;
+    use axum::extract::Path;
+
+    pub async fn forecast(Path(area_code): Path<AREA_CODE>) -> String {
+        print!("   Area Code: {:?}", area_code);
+        "Hello".to_string()
+    }
+}
+
 #[tokio::main]
 async fn main() {
-
     #[derive(OpenApi)]
     #[openapi(
         paths(
@@ -43,12 +56,12 @@ async fn main() {
         }
     }
 
-
     // build our application with a single route
     let app = Router::new()
-    .merge(SwaggerUi::new("/swagger-ui").url("/api-docs/openapi.json", ApiDoc::openapi()))
-    .merge(Redoc::with_url("/redoc", ApiDoc::openapi()))
-    .route("/", get(|| async { "Hello, World!" }));
+        .merge(SwaggerUi::new("/swagger-ui").url("/api-docs/openapi.json", ApiDoc::openapi()))
+        .merge(Redoc::with_url("/redoc", ApiDoc::openapi()))
+        .route("/", get(|| async { "Hello, World!" }))
+        .route("/forecast/:area_code", get(forecast::forecast));
 
     // run it with hyper on localhost:3000
     axum::Server::bind(&"0.0.0.0:3000".parse().unwrap())
@@ -60,7 +73,7 @@ async fn main() {
 mod hello {
     use axum::Json;
 
-        /// List all Todo items
+    /// List all Todo items
     ///
     /// List all Todo items from in-memory storage.
     #[utoipa::path(
@@ -71,7 +84,6 @@ mod hello {
         )
     )]
     pub(super) async fn world() -> Json<Vec<String>> {
-
         let return_string = "Hello, World!".to_owned();
         Json(vec![return_string])
     }
