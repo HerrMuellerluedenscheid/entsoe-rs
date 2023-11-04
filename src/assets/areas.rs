@@ -12,13 +12,15 @@ pub enum AREA_CODE {
     DE_50HZ,
 }
 
-pub fn get_area(area_key: AREA_CODE) -> Area {
-    match area_key {
-        AREA_CODE::DE_50HZ => Area {
-            code: "10YDE-VE-------2",
-            meaning: "50Hertz CA, DE(50HzT) BZA",
-            timezone: "Europe/Berlin",
-        },
+impl AREA_CODE {
+    pub fn get_area(&self) -> Area {
+        match self {
+            AREA_CODE::DE_50HZ => Area {
+                code: "10YDE-VE-------2",
+                meaning: "50Hertz CA, DE(50HzT) BZA",
+                timezone: "Europe/Berlin",
+            },
+        }
     }
 }
 
@@ -28,7 +30,7 @@ mod tests {
 
     #[test]
     fn test_areas() {
-        assert_eq!(get_area(AREA_CODE::DE_50HZ).code, "10YDE-VE-------2");
+        assert_eq!(AREA_CODE::DE_50HZ.get_area().code, "10YDE-VE-------2");
     }
 }
 

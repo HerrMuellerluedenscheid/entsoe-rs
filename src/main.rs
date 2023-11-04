@@ -23,7 +23,7 @@ use utoipa_swagger_ui::SwaggerUi;
 
 mod forecast {
     use crate::{
-        assets::{ProcessType, AREA_CODE},
+        assets::{DocumentType, ProcessType, AREA_CODE},
         entsoe::EntsoeClient,
         AppState,
     };
@@ -35,6 +35,7 @@ mod forecast {
     pub struct Params {
         pub area_code: AREA_CODE,
         pub process_type: ProcessType,
+        pub document_type: DocumentType,
     }
 
     pub async fn forecast(params: Query<Params>, State(state): State<AppState>) -> String {
@@ -43,6 +44,7 @@ mod forecast {
         let result = client
             .with_area_code(params.area_code)
             .with_process_type(params.process_type)
+            .with_document_type(params.document_type)
             .request()
             .await;
         result

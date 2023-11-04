@@ -1,4 +1,4 @@
-// Generated with crate xml_schema_generator 
+// Generated with crate xml_schema_generator
 // cargo run --features="env_logger" -- input.xml
 
 use serde::{Deserialize, Serialize};
