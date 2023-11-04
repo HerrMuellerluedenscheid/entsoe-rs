@@ -1,4 +1,3 @@
-use phf::phf_map;
 use serde::{Deserialize, Serialize};
 
 pub struct Area {
@@ -7,9 +6,15 @@ pub struct Area {
     pub timezone: &'static str,
 }
 
-#[derive(Hash, Eq, PartialEq, Serialize, Deserialize, Debug)]
+#[derive(Hash, Eq, PartialEq, Serialize, Deserialize, Debug, Clone)]
 pub enum AREA_CODE {
     DE_50HZ,
+}
+
+impl std::fmt::Display for AREA_CODE {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(f, "{}", self)
+    }
 }
 
 pub fn get_area(area_key: AREA_CODE) -> Area {

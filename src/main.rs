@@ -1,9 +1,11 @@
 pub mod assets;
 mod entsoe;
 use axum::{
+    extract::State,
     routing::{self, get},
     Router, Server,
 };
+use dotenvy::dotenv;
 use hyper::Error;
 use std::{
     net::{Ipv4Addr, SocketAddr},
@@ -18,19 +20,42 @@ use utoipa_redoc::{Redoc, Servable};
 use utoipa_swagger_ui::SwaggerUi;
 
 mod forecast {
-    use crate::assets::AREA_CODE;
-    use crate::entsoe::day_ahead_load;
-    use axum::extract::Path;
+    use crate::{
+        assets::{ProcessType, AREA_CODE},
+        entsoe::EntsoeClient,
+        AppState,
+    };
+    use axum::extract::{Query, State};
+    use serde::Deserialize;
 
-    pub async fn forecast(Path(area_code): Path<AREA_CODE>) -> String {
-        print!("   Area Code: {:?}", area_code);
-        day_ahead_load(area_code).await;
-        "Hello".to_string()
+    #[derive(Debug, Deserialize, Clone)]
+    pub struct Params {
+        pub area_code: AREA_CODE,
+        pub process_type: ProcessType,
     }
+
+    pub async fn forecast(params: Query<Params>, State(state): State<AppState>) -> String {
+        let params: Params = params.0;
+        println!(" {:?} ", params.process_type.description());
+        println!("   Area Code: {:?}", params.area_code);
+        let client = EntsoeClient::new(state.entsoe_api_key)
+            .with_area_code(params.area_code)
+            .with_process_type(params.process_type);
+        // let response = day_ahead_load(params.area_code, params.process_type).await;
+        // client.request().await
+        "done".to_owned()
+    }
+}
+
+#[derive(Clone)]
+pub struct AppState {
+    entsoe_api_key: String,
 }
 
 #[tokio::main]
 async fn main() {
+    dotenv().unwrap();
+
     #[derive(OpenApi)]
     #[openapi(
         paths(
@@ -58,15 +83,17 @@ async fn main() {
         }
     }
 
+    let entsoe_api_key =
+        std::env::var("ENTSOE_API_KEY").expect("ENTSOE_API_KEY is undefined env var");
     // build our application with a single route
     let app = Router::new()
         .merge(SwaggerUi::new("/swagger-ui").url("/api-docs/openapi.json", ApiDoc::openapi()))
         .merge(Redoc::with_url("/redoc", ApiDoc::openapi()))
         .route("/", get(|| async { "Hello, World!" }))
-        .route("/forecast/:area_code", get(forecast::forecast));
+        .route("/forecast", get(forecast::forecast))
+        .with_state(AppState { entsoe_api_key });
 
-    // run it with hyper on localhost:3000
-    axum::Server::bind(&"0.0.0.0:3000".parse().unwrap())
+    axum::Server::bind(&"127.0.0.1:3000".parse().unwrap())
         .serve(app.into_make_service())
         .await
         .unwrap();

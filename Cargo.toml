@@ -6,7 +6,7 @@ edition = "2021"
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
-axum = "0.6"
+axum = {version="0.6", features=["query"]}
 hyper = { version = "0.14", features = ["full"] }
 tokio = { version = "1.17", features = ["full"] }
 tower = "0.4"
@@ -22,3 +22,5 @@ phf = { version="0.11.2", features = ["macros"] }
 thiserror = "1.0.50"
 eyre = "0.6.8"
 reqwest = "0.11.22"
+dotenvy = "0.15.7"
+strum = {version="0.25.0", features=["derive"]}
