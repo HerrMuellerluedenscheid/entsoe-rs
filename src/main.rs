@@ -6,6 +6,7 @@ use axum::{
     Router, Server,
 };
 use dotenvy::dotenv;
+use entsoe::EntsoeClient;
 use hyper::Error;
 use std::{
     net::{Ipv4Addr, SocketAddr},
@@ -26,6 +27,7 @@ mod forecast {
         AppState,
     };
     use axum::extract::{Query, State};
+    use hyper::client;
     use serde::Deserialize;
 
     #[derive(Debug, Deserialize, Clone)]
@@ -38,9 +40,11 @@ mod forecast {
         let params: Params = params.0;
         println!(" {:?} ", params.process_type.description());
         println!("   Area Code: {:?}", params.area_code);
-        let client = EntsoeClient::new(state.entsoe_api_key)
-            .with_area_code(params.area_code)
-            .with_process_type(params.process_type);
+        let mut client = state.entsoe_client;
+        let result = client.with_area_code(params.area_code)
+            .with_process_type(params.process_type)
+            .request().await;      // let client = EntsoeClient::new(stateentsoe_api_key)
+
         // let response = day_ahead_load(params.area_code, params.process_type).await;
         // client.request().await
         "done".to_owned()
@@ -49,7 +53,7 @@ mod forecast {
 
 #[derive(Clone)]
 pub struct AppState {
-    entsoe_api_key: String,
+    entsoe_client: EntsoeClient,
 }
 
 #[tokio::main]
@@ -91,7 +95,7 @@ async fn main() {
         .merge(Redoc::with_url("/redoc", ApiDoc::openapi()))
         .route("/", get(|| async { "Hello, World!" }))
         .route("/forecast", get(forecast::forecast))
-        .with_state(AppState { entsoe_api_key });
+        .with_state(AppState { entsoe_client: EntsoeClient::new(entsoe_api_key)});
 
     axum::Server::bind(&"127.0.0.1:3000".parse().unwrap())
         .serve(app.into_make_service())

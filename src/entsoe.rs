@@ -4,6 +4,7 @@ use std::{env, os::unix::process};
 
 static url: &str = "https://web-api.tp.entsoe.eu/api?";
 
+#[derive(Debug, Clone)]
 pub struct EntsoeClient {
     pub api_key: String,
     pub area_code: Option<AREA_CODE>,
