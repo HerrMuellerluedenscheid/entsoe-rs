@@ -1,5 +1,6 @@
 pub mod assets;
 mod entsoe;
+pub mod models;
 use axum::{
     extract::State,
     routing::{self, get},

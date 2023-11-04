@@ -1,8 +1,15 @@
-use crate::assets::{get_area, ProcessType, AREA_CODE};
+use crate::{
+    assets::{get_area, ProcessType, AREA_CODE},
+    models,
+};
 use eyre::Result;
+use hyper::StatusCode;
 use std::{env, os::unix::process};
 
 static url: &str = "https://web-api.tp.entsoe.eu/api?";
+use models::error::AcknowledgementMarketDocument as EntsoeErrorResponse;
+use quick_xml::de::from_str;
+use serde::Deserialize;
 
 #[derive(Debug, Clone)]
 pub struct EntsoeClient {
@@ -31,27 +38,20 @@ impl EntsoeClient {
     }
     pub async fn request(self) -> String {
         let fetch_from = format!("{}&documentType=A65&processType=A01&outBiddingZone_Domain={}&periodStart=201512312300&periodEnd=201612312300&{}&securityToken={}", url, self.area_code.unwrap(), self.process_type.unwrap().add_to_url(), self.api_key);
-        let resp = reqwest::get(&fetch_from).await;
-        let r = resp.unwrap().text().await.unwrap();
+        println!("{}", fetch_from);
+        let resp = reqwest::get(&fetch_from).await.unwrap();
+        match resp.status() {
+            StatusCode::OK => return resp.text().await.unwrap(),
+            _ => {
+                let x = resp.text().await.unwrap();
+                let root: EntsoeErrorResponse = from_str(&x).unwrap();
+                println!("Error: {}", root.reason.text);
+            }
+        };
 
-        format!("Done {}", r).to_owned()
+        format!("Done").to_owned()
     }
 }
-
-// pub fn day_ahead_load_url(area_code: AREA_CODE, process_type: ProcessType) -> String {
-//     // let ENTSOE_API_KEY = env::var("ENTSOE_API_KEY").unwrap();
-//     let area = get_area(area_code);
-//     let fetch_from = format!("{}&documentType=A65&processType=A01&outBiddingZone_Domain={}&periodStart=201512312300&periodEnd=201612312300&{}&securityToken={}", url, area.code, process_type.add_url(), ENTSOE_API_KEY);
-//     fetch_from
-// }
-
-// pub async fn day_ahead_load(area_code: AREA_CODE, process_type: ProcessType) -> Result<String> {
-//     let fetch_from = day_ahead_load_url(area_code, process_type);
-//     let resp = reqwest::get(&fetch_from).await?;
-//     println!("Status: {}", resp.status());
-//     let body = resp.text().await?;
-//     Ok(body)
-// }
 
 #[cfg(test)]
 mod tests {
@@ -67,6 +67,5 @@ mod tests {
     async fn test_generator() {
         let area_code = AREA_CODE::DE_50HZ;
         let client = EntsoeClient::new("".to_string());
-        client.with_area_code(area_code).request().await;
     }
 }

@@ -21,7 +21,7 @@ pub enum ProcessType {
 
 impl ProcessType {
     pub fn add_to_url(&self) -> String {
-        format!("processType={}", "self")
+        format!("processType={}", self.to_string())
     }
 
     pub fn description(&self) -> String {
@@ -45,11 +45,12 @@ impl ProcessType {
     }
 }
 
-// #[cfg(test)]
-// mod test {
-//     use super::ProcessType;
+#[cfg(test)]
+mod test {
+    use super::ProcessType;
 
-//     fn test_process_type() {
-//         assert_eq!(ProcessType::A01.to_string(), "A01");
-//     }
-// }
+    #[test]
+    fn test_process_type() {
+        assert_eq!(ProcessType::A01.to_string(), "A01");
+    }
+}
