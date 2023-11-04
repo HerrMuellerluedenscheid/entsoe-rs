@@ -38,16 +38,13 @@ mod forecast {
 
     pub async fn forecast(params: Query<Params>, State(state): State<AppState>) -> String {
         let params: Params = params.0;
-        println!(" {:?} ", params.process_type.description());
-        println!("   Area Code: {:?}", params.area_code);
-        let mut client = state.entsoe_client;
-        let result = client.with_area_code(params.area_code)
+        let client = state.entsoe_client;
+        let result = client
+            .with_area_code(params.area_code)
             .with_process_type(params.process_type)
-            .request().await;      // let client = EntsoeClient::new(stateentsoe_api_key)
-
-        // let response = day_ahead_load(params.area_code, params.process_type).await;
-        // client.request().await
-        "done".to_owned()
+            .request()
+            .await;
+        result
     }
 }
 
@@ -95,7 +92,9 @@ async fn main() {
         .merge(Redoc::with_url("/redoc", ApiDoc::openapi()))
         .route("/", get(|| async { "Hello, World!" }))
         .route("/forecast", get(forecast::forecast))
-        .with_state(AppState { entsoe_client: EntsoeClient::new(entsoe_api_key)});
+        .with_state(AppState {
+            entsoe_client: EntsoeClient::new(entsoe_api_key),
+        });
 
     axum::Server::bind(&"127.0.0.1:3000".parse().unwrap())
         .serve(app.into_make_service())

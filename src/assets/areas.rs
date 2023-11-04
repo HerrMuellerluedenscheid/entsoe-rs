@@ -1,4 +1,5 @@
 use serde::{Deserialize, Serialize};
+use strum::Display;
 
 pub struct Area {
     pub code: &'static str,
@@ -6,15 +7,9 @@ pub struct Area {
     pub timezone: &'static str,
 }
 
-#[derive(Hash, Eq, PartialEq, Serialize, Deserialize, Debug, Clone)]
+#[derive(Hash, Eq, PartialEq, Serialize, Deserialize, Debug, Display, Clone)]
 pub enum AREA_CODE {
     DE_50HZ,
-}
-
-impl std::fmt::Display for AREA_CODE {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        write!(f, "{}", self)
-    }
 }
 
 pub fn get_area(area_key: AREA_CODE) -> Area {

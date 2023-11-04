@@ -31,9 +31,10 @@ impl EntsoeClient {
     }
     pub async fn request(self) -> String {
         let fetch_from = format!("{}&documentType=A65&processType=A01&outBiddingZone_Domain={}&periodStart=201512312300&periodEnd=201612312300&{}&securityToken={}", url, self.area_code.unwrap(), self.process_type.unwrap().add_to_url(), self.api_key);
-        // let resp = reqwest::get(&fetch_from).await;
-        // resp.unwrap().text().await.unwrap()
-        "Done".to_owned()
+        let resp = reqwest::get(&fetch_from).await;
+        let r = resp.unwrap().text().await.unwrap();
+
+        format!("Done {}", r).to_owned()
     }
 }
 
