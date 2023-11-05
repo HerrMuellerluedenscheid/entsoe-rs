@@ -17,6 +17,10 @@ pub enum ProcessType {
     A51,
     A52,
     A56,
+    A60,
+    A61,
+    A67,
+    A68,
 }
 
 impl ProcessType {
@@ -25,7 +29,7 @@ impl ProcessType {
     }
 
     pub fn description(&self) -> String {
-        let named = match &self {
+        match &self {
             ProcessType::A01 => "Day ahead",
             ProcessType::A02 => "Intra day incremental",
             ProcessType::A16 => "Realised",
@@ -39,9 +43,13 @@ impl ProcessType {
             ProcessType::A47 => "Manual frequency restoration reserve",
             ProcessType::A51 => "Automatic frequency restoration reserve",
             ProcessType::A52 => "Frequency containment reserve",
-            ProcessType::A56 => "Frequency restoration reserv",
-        };
-        named.to_string()
+            ProcessType::A56 => "Frequency restoration reserve",
+            ProcessType::A60 => "Scheduled activation mFRR",
+            ProcessType::A61 => "Direct activation mFRR",
+            ProcessType::A67 => "Central Selection aFRR",
+            ProcessType::A68 => "Local Selection aFRR",
+        }
+        .to_string()
     }
 }
 
