@@ -1,7 +1,9 @@
 use crate::{
     assets::{DocumentType, ProcessType, PsrType, AREA_CODE},
+    error::EntsoeError,
     models,
 };
+use axum::http;
 use eyre::Result;
 use hyper::StatusCode;
 use std::{env, os::unix::process};
@@ -49,17 +51,27 @@ impl EntsoeClient {
     }
     pub async fn request(self) -> String {
         let fetch_from = format!("{}{}&in_Domain={}&periodStart=201512312300&periodEnd=201612312300&securityToken={}{}{}", url, self.process_type.unwrap().add_to_url(), self.area_code.unwrap().get_area().code, self.api_key, self.document_type.unwrap().add_to_url(), self.psr_type.unwrap().add_to_url());
-        println!("{}", fetch_from);
+        println!("fetch from {}", fetch_from);
         let resp = reqwest::get(&fetch_from).await.unwrap();
-        match resp.status() {
-            StatusCode::OK => return resp.text().await.unwrap(),
-            _ => {
-                let x = resp.text().await.unwrap();
-                let root: EntsoeErrorResponse = from_str(&x).unwrap();
-                println!("Error: {}", root.reason.text);
-            }
-        };
+        let status = resp.status();
+        let entsoe_response: EntsoeErrorResponse = from_str(&resp.text().await.unwrap()).unwrap();
+        let entsoe_code = entsoe_response.reason.code.as_str();
+        let entsoe_reason = entsoe_response.reason.text;
 
+        match (status, entsoe_code) {
+            (http::StatusCode::OK, "") => {
+                println!("OK");
+            }
+            (http::StatusCode::OK, "999") => {
+                let e = EntsoeError::NoMatchingDataFound(entsoe_reason);
+                println!("{:?}", e);
+            }
+            (http::StatusCode::BAD_REQUEST, "999") => {
+                let e = EntsoeError::InvalidQueryAttributesOrParameters(entsoe_reason);
+                println!("{:?}", e);
+            }
+            _ => println!("Error:..."),
+        }
         format!("Done").to_owned()
     }
 }

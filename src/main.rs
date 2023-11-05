@@ -1,5 +1,6 @@
 pub mod assets;
 mod entsoe;
+mod error;
 pub mod models;
 use axum::{
     extract::State,
