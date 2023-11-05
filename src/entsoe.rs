@@ -43,6 +43,10 @@ impl EntsoeClient {
         self.document_type = Some(document_type);
         self
     }
+    pub fn with_psr_type(mut self, psr_type: PsrType) -> Self {
+        self.psr_type = Some(psr_type);
+        self
+    }
     pub async fn request(self) -> String {
         let fetch_from = format!("{}{}&in_Domain={}&periodStart=201512312300&periodEnd=201612312300&securityToken={}{}{}", url, self.process_type.unwrap().add_to_url(), self.area_code.unwrap().get_area().code, self.api_key, self.document_type.unwrap().add_to_url(), self.psr_type.unwrap().add_to_url());
         println!("{}", fetch_from);
