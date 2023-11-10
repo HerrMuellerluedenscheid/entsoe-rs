@@ -3,34 +3,29 @@ mod entsoe;
 mod error;
 pub mod models;
 use axum::{
-    extract::State,
-    routing::{self, get},
-    Router, Server,
+    routing::{get},
+    Router,
 };
 use dotenvy::dotenv;
 use entsoe::EntsoeClient;
-use eyre::Result;
-use hyper::Error;
-use std::{
-    net::{Ipv4Addr, SocketAddr},
-    sync::Arc,
-};
+
+
+
 use utoipa::{
     openapi::security::{ApiKey, ApiKeyValue, SecurityScheme},
     Modify, OpenApi,
 };
-use utoipa_rapidoc::RapiDoc;
+
 use utoipa_redoc::{Redoc, Servable};
 use utoipa_swagger_ui::SwaggerUi;
 
 mod forecast {
     use crate::{
         assets::{DocumentType, ProcessType, PsrType, AREA_CODE},
-        entsoe::EntsoeClient,
         AppState,
     };
     use axum::extract::{Query, State};
-    use hyper::client;
+    
     use serde::Deserialize;
 
     #[derive(Debug, Deserialize, Clone)]

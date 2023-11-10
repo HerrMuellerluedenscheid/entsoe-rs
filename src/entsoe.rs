@@ -1,18 +1,16 @@
 use crate::{
     assets::{DocumentType, ProcessType, PsrType, UriElement, AREA_CODE},
-    error::EntsoeError,
-    models,
 };
-use axum::http;
+
 use eyre::Result;
-use hyper::StatusCode;
-use reqwest::IntoUrl;
-use std::{env, os::unix::process};
-use url::{ParseError, Url};
+
+
+
+use url::{Url};
 
 static BASE_URL: &str = "https://web-api.tp.entsoe.eu/api?";
-use models::error::AcknowledgementMarketDocument as EntsoeErrorResponse;
-use quick_xml::de::from_str;
+
+
 
 #[derive(Debug, Clone, Default)]
 pub struct EntsoeClient {
@@ -75,7 +73,7 @@ impl EntsoeClient {
         }
 
         log::info!("params {:?}", params);
-        Url::parse_with_params(&BASE_URL, &params).expect("failed parsing url")
+        Url::parse_with_params(BASE_URL, &params).expect("failed parsing url")
     }
 
     pub async fn request(self) -> Result<String> {
@@ -85,9 +83,9 @@ impl EntsoeClient {
         match resp {
             Ok(resp) => {
                 let body = resp.text().await?;
-                return Ok(body);
+                Ok(body)
             }
-            Err(e) => return Err(e.into()),
+            Err(e) => Err(e.into()),
         }
         // let status = &resp.status();
         // let body = resp.text().await?;
