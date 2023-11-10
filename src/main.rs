@@ -2,14 +2,9 @@ pub mod assets;
 mod entsoe;
 mod error;
 pub mod models;
-use axum::{
-    routing::{get},
-    Router,
-};
+use axum::{routing::get, Router};
 use dotenvy::dotenv;
 use entsoe::EntsoeClient;
-
-
 
 use utoipa::{
     openapi::security::{ApiKey, ApiKeyValue, SecurityScheme},
@@ -25,7 +20,7 @@ mod forecast {
         AppState,
     };
     use axum::extract::{Query, State};
-    
+
     use serde::Deserialize;
 
     #[derive(Debug, Deserialize, Clone)]

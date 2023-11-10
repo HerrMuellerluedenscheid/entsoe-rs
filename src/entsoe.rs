@@ -1,16 +1,14 @@
 use crate::{
     assets::{DocumentType, ProcessType, PsrType, UriElement, AREA_CODE},
+    models::AcknowledgementMarketDocument,
 };
 
 use eyre::Result;
+use quick_xml::de::from_str;
 
-
-
-use url::{Url};
+use url::Url;
 
 static BASE_URL: &str = "https://web-api.tp.entsoe.eu/api?";
-
-
 
 #[derive(Debug, Clone, Default)]
 pub struct EntsoeClient {
@@ -83,7 +81,9 @@ impl EntsoeClient {
         match resp {
             Ok(resp) => {
                 let body = resp.text().await?;
-                Ok(body)
+                let entsoe_response: AcknowledgementMarketDocument = from_str(&body).unwrap();
+                println!("{:?}", entsoe_response.reason.text);
+                return Ok(body);
             }
             Err(e) => Err(e.into()),
         }

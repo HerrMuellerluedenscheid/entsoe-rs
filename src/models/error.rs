@@ -1,15 +1,6 @@
 // Generated with crate xml_schema_generator
 // cargo run --features="env_logger" -- input.xml
-
 use serde::{Deserialize, Serialize};
-
-#[derive(Debug, Serialize, Deserialize)]
-pub struct Root {
-    #[serde(rename = "$text")]
-    pub text: Option<String>,
-    #[serde(rename = "Acknowledgement_MarketDocument")]
-    pub acknowledgement_market_document: AcknowledgementMarketDocument,
-}
 
 #[derive(Debug, Serialize, Deserialize)]
 pub struct AcknowledgementMarketDocument {
@@ -57,6 +48,8 @@ pub struct Reason {
     pub code: String,
     #[serde(rename = "text")]
     pub text: String,
+    // #[serde(rename = "$text")]
+    // pub text: Option<String>,
 }
 
 #[cfg(test)]
