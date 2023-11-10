@@ -1,6 +1,8 @@
 use serde::{Deserialize, Serialize};
 use strum::Display;
 
+use super::UriElement;
+
 #[derive(Debug, Display, Serialize, Deserialize, Clone)]
 pub enum ProcessType {
     A01,
@@ -24,10 +26,6 @@ pub enum ProcessType {
 }
 
 impl ProcessType {
-    pub fn add_to_url(&self) -> String {
-        format!("processType={}", self.to_string())
-    }
-
     pub fn description(&self) -> String {
         match &self {
             ProcessType::A01 => "Day ahead",
@@ -50,6 +48,12 @@ impl ProcessType {
             ProcessType::A68 => "Local Selection aFRR",
         }
         .to_string()
+    }
+}
+
+impl UriElement for ProcessType {
+    fn add_to_url(&self, params: &mut Vec<(&str, String)>) {
+        params.push(("processType", self.to_string()));
     }
 }
 

@@ -1,6 +1,8 @@
 use serde::{Deserialize, Serialize};
 use strum::Display;
 
+use super::UriElement;
+
 #[derive(Display, Debug, Clone, Copy, Serialize, Deserialize)]
 pub enum PsrType {
     A03,
@@ -33,10 +35,6 @@ pub enum PsrType {
 }
 
 impl PsrType {
-    pub fn add_to_url(&self) -> String {
-        format!("&psrType={:?}", self)
-    }
-
     pub fn description(self) -> String {
         match self {
             PsrType::A03 => "Mixed",
@@ -68,5 +66,11 @@ impl PsrType {
             PsrType::B24 => "Transformer ",
         }
         .to_string()
+    }
+}
+
+impl UriElement for PsrType {
+    fn add_to_url(&self, params: &mut Vec<(&str, String)>) {
+        params.push(("psrType", self.to_string()));
     }
 }

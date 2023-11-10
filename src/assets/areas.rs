@@ -1,6 +1,8 @@
 use serde::{Deserialize, Serialize};
 use strum::Display;
 
+use super::UriElement;
+
 pub struct Area {
     pub code: &'static str,
     pub meaning: &'static str,
@@ -21,6 +23,12 @@ impl AREA_CODE {
                 timezone: "Europe/Berlin",
             },
         }
+    }
+}
+
+impl UriElement for AREA_CODE {
+    fn add_to_url(&self, params: &mut Vec<(&str, String)>) {
+        params.push(("in_Domain", self.get_area().code.to_owned()));
     }
 }
 

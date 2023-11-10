@@ -1,6 +1,9 @@
 use serde::{Deserialize, Serialize};
+use strum::Display;
 
-#[derive(Debug, Clone, Copy, Serialize, Deserialize)]
+use super::UriElement;
+
+#[derive(Debug, Display, Clone, Copy, Serialize, Deserialize)]
 pub enum DocumentType {
     A09,
     A11,
@@ -98,9 +101,11 @@ impl DocumentType {
         };
         format!("{} ({:?})", description, self)
     }
+}
 
-    pub fn add_to_url(self) -> String {
-        format!("&documentType={:?}", self)
+impl UriElement for DocumentType {
+    fn add_to_url(&self, params: &mut Vec<(&str, String)>) {
+        params.push(("documentType", self.to_string()));
     }
 }
 

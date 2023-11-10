@@ -9,6 +9,7 @@ use axum::{
 };
 use dotenvy::dotenv;
 use entsoe::EntsoeClient;
+use eyre::Result;
 use hyper::Error;
 use std::{
     net::{Ipv4Addr, SocketAddr},
@@ -50,7 +51,7 @@ mod forecast {
             .with_psr_type(params.psr_type)
             .request()
             .await;
-        result
+        result.unwrap()
     }
 }
 

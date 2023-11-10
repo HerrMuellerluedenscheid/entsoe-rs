@@ -1,18 +1,20 @@
 use crate::{
-    assets::{DocumentType, ProcessType, PsrType, AREA_CODE},
+    assets::{DocumentType, ProcessType, PsrType, UriElement, AREA_CODE},
     error::EntsoeError,
     models,
 };
 use axum::http;
 use eyre::Result;
 use hyper::StatusCode;
+use reqwest::IntoUrl;
 use std::{env, os::unix::process};
+use url::{ParseError, Url};
 
-static url: &str = "https://web-api.tp.entsoe.eu/api?";
+static BASE_URL: &str = "https://web-api.tp.entsoe.eu/api?";
 use models::error::AcknowledgementMarketDocument as EntsoeErrorResponse;
 use quick_xml::de::from_str;
 
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, Default)]
 pub struct EntsoeClient {
     pub api_key: String,
     pub area_code: Option<AREA_CODE>,
@@ -49,30 +51,63 @@ impl EntsoeClient {
         self.psr_type = Some(psr_type);
         self
     }
-    pub async fn request(self) -> String {
-        let fetch_from = format!("{}{}&in_Domain={}&periodStart=201512312300&periodEnd=201612312300&securityToken={}{}{}", url, self.process_type.unwrap().add_to_url(), self.area_code.unwrap().get_area().code, self.api_key, self.document_type.unwrap().add_to_url(), self.psr_type.unwrap().add_to_url());
-        println!("fetch from {}", fetch_from);
-        let resp = reqwest::get(&fetch_from).await.unwrap();
-        let status = resp.status();
-        let entsoe_response: EntsoeErrorResponse = from_str(&resp.text().await.unwrap()).unwrap();
-        let entsoe_code = entsoe_response.reason.code.as_str();
-        let entsoe_reason = entsoe_response.reason.text;
 
-        match (status, entsoe_code) {
-            (http::StatusCode::OK, "") => {
-                println!("OK");
-            }
-            (http::StatusCode::OK, "999") => {
-                let e = EntsoeError::NoMatchingDataFound(entsoe_reason);
-                println!("{:?}", e);
-            }
-            (http::StatusCode::BAD_REQUEST, "999") => {
-                let e = EntsoeError::InvalidQueryAttributesOrParameters(entsoe_reason);
-                println!("{:?}", e);
-            }
-            _ => println!("Error:..."),
+    fn get_url(self) -> Url {
+        let mut params = vec![("securityToken", self.api_key)];
+        params.push(("periodStart", "201512312300".to_owned()));
+        params.push(("periodEnd", "201612312300".to_owned()));
+
+        // Removed unused variable
+        if let Some(process_type) = self.process_type {
+            process_type.add_to_url(&mut params);
         }
-        format!("Done").to_owned()
+
+        if let Some(psr_type) = self.psr_type {
+            psr_type.add_to_url(&mut params);
+        }
+
+        if let Some(area_code) = self.area_code {
+            area_code.add_to_url(&mut params);
+        }
+
+        if let Some(document_type) = self.document_type {
+            document_type.add_to_url(&mut params);
+        }
+
+        log::info!("params {:?}", params);
+        Url::parse_with_params(&BASE_URL, &params).expect("failed parsing url")
+    }
+
+    pub async fn request(self) -> Result<String> {
+        let url = self.get_url();
+        println!("fetch from {}", url);
+        let resp = reqwest::get(url).await?.error_for_status();
+        match resp {
+            Ok(resp) => {
+                let body = resp.text().await?;
+                return Ok(body);
+            }
+            Err(e) => return Err(e.into()),
+        }
+        // let status = &resp.status();
+        // let body = resp.text().await?;
+        // let entsoe_response: EntsoeErrorResponse = from_str(&body).unwrap();
+        // let entsoe_code = entsoe_response.reason.code.as_str();
+        // let entsoe_reason = entsoe_response.reason.text;
+        // let result = match (status, entsoe_code) {
+        //     (&http::StatusCode::OK, "") => {
+        //         return Ok(body)
+        //     }
+        //     (&http::StatusCode::OK, "999") => {
+        //         return Err(EntsoeError::NoMatchingDataFound(entsoe_reason).into())
+        //     }
+        //     (&http::StatusCode::BAD_REQUEST, "999") => {
+        //         return Err(EntsoeError::InvalidQueryAttributesOrParameters(entsoe_reason).into())
+        //     }
+        //     (_, _) => {
+        //         return Err(resp.error_for_status().unwrap_err().into())
+        //     }
+        // };
     }
 }
 
@@ -81,14 +116,12 @@ mod tests {
     use super::*;
 
     #[tokio::test]
-    async fn test_day_ahead_load() {
-        let area_code = AREA_CODE::DE_50HZ;
-        let process_type = ProcessType::A01;
-    }
-
-    #[tokio::test]
-    async fn test_generator() {
-        let area_code = AREA_CODE::DE_50HZ;
-        let client = EntsoeClient::new("".to_string());
+    async fn test_get_url() {
+        let client = EntsoeClient::new("api_key".to_string());
+        let url = client
+            .with_area_code(AREA_CODE::DE_50HZ)
+            .with_process_type(ProcessType::A31)
+            .get_url();
+        println!("url {:?}", url);
     }
 }
