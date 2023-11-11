@@ -26,12 +26,6 @@ impl AREA_CODE {
     }
 }
 
-impl UriElement for AREA_CODE {
-    fn add_to_url(&self, params: &mut Vec<(&str, String)>) {
-        params.push(("in_Domain", self.get_area().code.to_owned()));
-    }
-}
-
 #[cfg(test)]
 mod tests {
     use super::*;

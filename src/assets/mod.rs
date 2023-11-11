@@ -11,5 +11,5 @@ pub use process_types::*;
 pub use psr_types::*;
 
 pub trait UriElement {
-    fn add_to_url(&self, params: &mut Vec<(&str, String)>);
+    fn add_to_url(&self, params: &mut Vec<(&str, String)>, key: Option<String>);
 }

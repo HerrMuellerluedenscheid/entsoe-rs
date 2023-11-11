@@ -104,7 +104,7 @@ impl DocumentType {
 }
 
 impl UriElement for DocumentType {
-    fn add_to_url(&self, params: &mut Vec<(&str, String)>) {
+    fn add_to_url(&self, params: &mut Vec<(&str, String)>, key: Option<String>) {
         params.push(("documentType", self.to_string()));
     }
 }

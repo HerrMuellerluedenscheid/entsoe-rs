@@ -35,7 +35,7 @@ mod forecast {
         let params: Params = params.0;
         let client = state.entsoe_client;
         let result = client
-            .with_area_code(params.area_code)
+            // .with_area_code(params.area_code)
             .with_process_type(params.process_type)
             .with_document_type(params.document_type)
             .with_psr_type(params.psr_type)

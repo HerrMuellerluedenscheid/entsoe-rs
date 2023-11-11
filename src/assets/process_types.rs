@@ -52,7 +52,7 @@ impl ProcessType {
 }
 
 impl UriElement for ProcessType {
-    fn add_to_url(&self, params: &mut Vec<(&str, String)>) {
+    fn add_to_url(&self, params: &mut Vec<(&str, String)>, key: Option<String>) {
         params.push(("processType", self.to_string()));
     }
 }

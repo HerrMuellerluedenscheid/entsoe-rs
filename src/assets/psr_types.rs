@@ -70,7 +70,7 @@ impl PsrType {
 }
 
 impl UriElement for PsrType {
-    fn add_to_url(&self, params: &mut Vec<(&str, String)>) {
+    fn add_to_url(&self, params: &mut Vec<(&str, String)>, key: Option<String>) {
         params.push(("psrType", self.to_string()));
     }
 }

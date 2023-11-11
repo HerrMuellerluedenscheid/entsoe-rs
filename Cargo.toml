@@ -27,3 +27,4 @@ strum = {version="0.25.0", features=["derive"]}
 quick-xml = {version="0.31.0", features=["serialize"]}
 serde-xml-rs = "0.6.0"
 url = "2.4.1"
+chrono = "0.4.31"
