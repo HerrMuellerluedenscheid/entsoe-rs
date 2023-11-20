@@ -1,13 +1,13 @@
 use crate::{
     assets::{DocumentType, ProcessType, PsrType, UriElement, AREA_CODE},
     error::EntsoeError,
-    models::AcknowledgementMarketDocument,
+    forecast,
+    models::{AcknowledgementMarketDocument, GLMarketDocument},
 };
 
 use chrono::{DateTime, Utc};
 use eyre::Result;
 use quick_xml::de::from_str;
-
 use url::Url;
 
 type DateType = DateTime<chrono::Utc>;
@@ -128,28 +128,35 @@ impl EntsoeClient {
         // let resp = reqwest::get(url).await?.error_for_status();
         let resp = reqwest::get(url).await;
         // println!("resp {:?}", resp.unwrap().text().await?);
-        match resp {
-            Ok(resp) => {
-                let body = resp.text().await?;
-                println!("body {:?}", body);
-                let entsoe_response: AcknowledgementMarketDocument = from_str(&body).unwrap();
-                match entsoe_response.reason.code.as_str() {
-                    "" => return Ok(body),
-                    "999" => {
-                        return Err(
-                            EntsoeError::NoMatchingDataFound(entsoe_response.reason.text).into(),
-                        )
-                    }
-                    _ => {
-                        return Err(EntsoeError::InvalidQueryAttributesOrParameters(
-                            entsoe_response.reason.text,
-                        )
-                        .into())
-                    }
-                }
-            }
-            Err(e) => Err(e.into()),
-        }
+
+        let body = resp.unwrap().text().await?;
+        let parsed: GLMarketDocument = from_str(&body)?;
+        // GLMarketDocument::parse(body);
+        // forecast::parse_forecast(body);
+        println!("parsed {:?}", parsed);
+        Ok("eon".to_string())
+        // match resp {
+        //     Ok(resp) => {
+        //         let body = resp.text().await?;
+        //         println!("body {:?}", body);
+        //         let entsoe_response: AcknowledgementMarketDocument = from_str(&body).unwrap();
+        //         match entsoe_response.reason.code.as_str() {
+        //             "" => return Ok(body),
+        //             "999" => {
+        //                 return Err(
+        //                     EntsoeError::NoMatchingDataFound(entsoe_response.reason.text).into(),
+        //                 )
+        //             }
+        //             _ => {
+        //                 return Err(EntsoeError::InvalidQueryAttributesOrParameters(
+        //                     entsoe_response.reason.text,
+        //                 )
+        //                 .into())
+        //             }
+        //         }
+        //     }
+        //     Err(e) => Err(e.into()),
+        // }
         // Ok("".to_string())
         // let status = &resp.status();
         // let body = resp.text().await?;
@@ -182,6 +189,7 @@ mod tests {
     use super::*;
     use chrono::TimeZone;
     use dotenvy::dotenv;
+    use serde::{Deserialize, Serialize};
 
     #[tokio::test]
     async fn test_get_url() {
@@ -194,7 +202,7 @@ mod tests {
     }
 
     #[tokio::test]
-    async fn test_fetch() {
+    async fn test_fetch_week_ahead() {
         dotenv().unwrap();
         let entsoe_api_key =
             std::env::var("ENTSOE_API_KEY").expect("ENTSOE_API_KEY is undefined env var");
@@ -214,5 +222,47 @@ mod tests {
             .request()
             .await;
         println!("{:?}", result);
+    }
+
+    #[tokio::test]
+    async fn test_deserialize_datetime() {
+        #[derive(Debug, Deserialize, Serialize)]
+        struct Test {
+            pub period_start: DateType,
+        }
+
+        let t = Test {
+            period_start: chrono::Utc
+                .with_ymd_and_hms(2015, 12, 31, 23, 0, 0)
+                .unwrap(),
+        };
+
+        println!("test as json: {:?}", serde_json::to_string(&t).unwrap());
+    }
+
+    #[tokio::test]
+    async fn test_fetch_day_ahead() {
+        // GET /api?documentType=A69&processType=A01&psrType=B16&in_Domain=10YCZ-CEPS-----N&periodStart=201512312300&periodEnd=201612312300
+        dotenv().unwrap();
+        let entsoe_api_key =
+            std::env::var("ENTSOE_API_KEY").expect("ENTSOE_API_KEY is undefined env var");
+        let client = EntsoeClient::new(entsoe_api_key);
+        let start = chrono::Utc
+            .with_ymd_and_hms(2015, 12, 30, 23, 0, 0)
+            .unwrap();
+        let end = chrono::Utc
+            .with_ymd_and_hms(2015, 12, 31, 23, 0, 0)
+            .unwrap();
+        println!("start {:?}", start.format("%Y%m%d%H%M"));
+        let result = client
+            .with_period_start(start)
+            .with_period_end(end)
+            .with_in_domain(AREA_CODE::DE_50HZ)
+            .with_process_type(ProcessType::A01) // day ahead
+            .with_document_type(DocumentType::A69)
+            .with_psr_type(PsrType::B16)
+            .request()
+            .await;
+        // println!("{:?}", result);
     }
 }

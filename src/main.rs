@@ -14,18 +14,23 @@ use utoipa::{
 use utoipa_redoc::{Redoc, Servable};
 use utoipa_swagger_ui::SwaggerUi;
 
-mod forecast {
+pub mod forecast {
     use crate::{
         assets::{DocumentType, ProcessType, PsrType, AREA_CODE},
         AppState,
     };
     use axum::extract::{Query, State};
 
+    use chrono::{DateTime, Utc};
     use serde::Deserialize;
+
+    type DateType = DateTime<chrono::Utc>;
 
     #[derive(Debug, Deserialize, Clone)]
     pub struct Params {
-        pub area_code: AREA_CODE,
+        pub period_start: DateType,
+        pub period_end: DateType,
+        pub in_domain: AREA_CODE,
         pub process_type: ProcessType,
         pub document_type: DocumentType,
         pub psr_type: PsrType,
@@ -34,13 +39,20 @@ mod forecast {
     pub async fn forecast(params: Query<Params>, State(state): State<AppState>) -> String {
         let params: Params = params.0;
         let client = state.entsoe_client;
+
+        // let end = chrono::Utc
+        //     .with_ymd_and_hms(2015, 12, 31, 23, 0, 0)
+        //     .unwrap();
         let result = client
-            // .with_area_code(params.area_code)
-            .with_process_type(params.process_type)
+            .with_period_start(params.period_start)
+            .with_period_end(params.period_end)
+            .with_in_domain(params.in_domain)
+            .with_process_type(params.process_type) // day ahead
             .with_document_type(params.document_type)
             .with_psr_type(params.psr_type)
             .request()
             .await;
+        println!("{:?}", result);
         result.unwrap()
     }
 }
