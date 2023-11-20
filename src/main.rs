@@ -1,6 +1,7 @@
 pub mod assets;
 mod entsoe;
 mod error;
+
 pub mod models;
 use axum::{routing::get, Router};
 use dotenvy::dotenv;
@@ -17,10 +18,11 @@ use utoipa_swagger_ui::SwaggerUi;
 pub mod forecast {
     use crate::{
         assets::{DocumentType, ProcessType, PsrType, AREA_CODE},
+        models::GLMarketDocument,
         AppState,
     };
     use axum::extract::{Query, State};
-
+    use axum::Json;
     use chrono::{DateTime, Utc};
     use serde::Deserialize;
 
@@ -36,13 +38,9 @@ pub mod forecast {
         pub psr_type: PsrType,
     }
 
-    pub async fn forecast(params: Query<Params>, State(state): State<AppState>) -> String {
+    pub async fn forecast(params: Query<Params>, State(state): State<AppState>) -> Json<String> {
         let params: Params = params.0;
         let client = state.entsoe_client;
-
-        // let end = chrono::Utc
-        //     .with_ymd_and_hms(2015, 12, 31, 23, 0, 0)
-        //     .unwrap();
         let result = client
             .with_period_start(params.period_start)
             .with_period_end(params.period_end)
@@ -52,8 +50,9 @@ pub mod forecast {
             .with_psr_type(params.psr_type)
             .request()
             .await;
-        println!("{:?}", result);
-        result.unwrap()
+        let as_json = result.map(|x| serde_json::to_string(&x).unwrap()).unwrap();
+        println!("sending bytes {:?}", as_json.len());
+        Json(as_json)
     }
 }
 

@@ -122,19 +122,14 @@ impl EntsoeClient {
         Url::parse_with_params(BASE_URL, &params).expect("failed parsing url")
     }
 
-    pub async fn request(self) -> Result<String> {
+    pub async fn request(self) -> Result<GLMarketDocument> {
         let url = self.get_url();
         println!("fetch from {}", url);
-        // let resp = reqwest::get(url).await?.error_for_status();
         let resp = reqwest::get(url).await;
-        // println!("resp {:?}", resp.unwrap().text().await?);
 
         let body = resp.unwrap().text().await?;
         let parsed: GLMarketDocument = from_str(&body)?;
-        // GLMarketDocument::parse(body);
-        // forecast::parse_forecast(body);
-        println!("parsed {:?}", parsed);
-        Ok("eon".to_string())
+        Ok(parsed)
         // match resp {
         //     Ok(resp) => {
         //         let body = resp.text().await?;
@@ -157,26 +152,6 @@ impl EntsoeClient {
         //     }
         //     Err(e) => Err(e.into()),
         // }
-        // Ok("".to_string())
-        // let status = &resp.status();
-        // let body = resp.text().await?;
-        // let entsoe_response: EntsoeErrorResponse = from_str(&body).unwrap();
-        // let entsoe_code = entsoe_response.reason.code.as_str();
-        // let entsoe_reason = entsoe_response.reason.text;
-        // let result = match (status, entsoe_code) {
-        //     (&http::StatusCode::OK, "") => {
-        //         return Ok(body)
-        //     }
-        //     (&http::StatusCode::OK, "999") => {
-        //         return Err(EntsoeError::NoMatchingDataFound(entsoe_reason).into())
-        //     }
-        //     (&http::StatusCode::BAD_REQUEST, "999") => {
-        //         return Err(EntsoeError::InvalidQueryAttributesOrParameters(entsoe_reason).into())
-        //     }
-        //     (_, _) => {
-        //         return Err(resp.error_for_status().unwrap_err().into())
-        //     }
-        // };
     }
 }
 
