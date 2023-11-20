@@ -1,8 +1,11 @@
 // Generated with crate xml_schema_generator
 // cargo run --features="env_logger" -- input.xml
 use serde::{Deserialize, Serialize};
+use utoipa::ToSchema;
 
-#[derive(Debug, Serialize, Deserialize)]
+use super::{ReceiverMarketParticipantMRID, SenderMarketParticipantMRID};
+
+#[derive(Debug, Serialize, Deserialize, ToSchema)]
 pub struct AcknowledgementMarketDocument {
     #[serde(rename = "mRID")]
     pub m_rid: String,
@@ -26,23 +29,7 @@ pub struct AcknowledgementMarketDocument {
     pub reason: Reason,
 }
 
-#[derive(Debug, Serialize, Deserialize)]
-pub struct SenderMarketParticipantMRID {
-    #[serde(rename = "@codingScheme")]
-    pub coding_scheme: String,
-    #[serde(rename = "$text")]
-    pub text: Option<String>,
-}
-
-#[derive(Debug, Serialize, Deserialize)]
-pub struct ReceiverMarketParticipantMRID {
-    #[serde(rename = "@codingScheme")]
-    pub coding_scheme: String,
-    #[serde(rename = "$text")]
-    pub text: Option<String>,
-}
-
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Debug, Serialize, Deserialize, ToSchema)]
 pub struct Reason {
     #[serde(rename = "code")]
     pub code: String,

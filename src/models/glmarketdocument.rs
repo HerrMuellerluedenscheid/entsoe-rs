@@ -1,6 +1,7 @@
 use serde::{Deserialize, Serialize};
+use utoipa::ToSchema;
 
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Debug, Serialize, Deserialize, ToSchema)]
 pub struct GLMarketDocument {
     #[serde(rename = "mRID")]
     pub m_rid: String,
@@ -30,7 +31,7 @@ pub struct GLMarketDocument {
     pub time_series: Vec<TimeSeries>,
 }
 
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Debug, Serialize, Deserialize, ToSchema)]
 pub struct SenderMarketParticipantMRID {
     #[serde(rename = "@codingScheme")]
     pub coding_scheme: String,
@@ -38,7 +39,7 @@ pub struct SenderMarketParticipantMRID {
     pub text: Option<String>,
 }
 
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Debug, Serialize, Deserialize, ToSchema)]
 pub struct ReceiverMarketParticipantMRID {
     #[serde(rename = "@codingScheme")]
     pub coding_scheme: String,
@@ -46,7 +47,7 @@ pub struct ReceiverMarketParticipantMRID {
     pub text: Option<String>,
 }
 
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Debug, Serialize, Deserialize, ToSchema)]
 pub struct TimePeriodTimeInterval {
     #[serde(rename = "start")]
     pub start: String,
@@ -56,7 +57,7 @@ pub struct TimePeriodTimeInterval {
     pub text: Option<String>,
 }
 
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Debug, Serialize, Deserialize, ToSchema)]
 pub struct TimeSeries {
     #[serde(rename = "mRID")]
     pub m_rid: String,
@@ -78,7 +79,7 @@ pub struct TimeSeries {
     pub period: Period,
 }
 
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Debug, Serialize, Deserialize, ToSchema)]
 pub struct InBiddingZoneDomainMRID {
     #[serde(rename = "@codingScheme")]
     pub coding_scheme: String,
@@ -86,7 +87,7 @@ pub struct InBiddingZoneDomainMRID {
     pub text: Option<String>,
 }
 
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Debug, Serialize, Deserialize, ToSchema)]
 pub struct MktPSRType {
     #[serde(rename = "psrType")]
     pub psr_type: String,
@@ -94,7 +95,7 @@ pub struct MktPSRType {
     pub text: Option<String>,
 }
 
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Debug, Serialize, Deserialize, ToSchema)]
 pub struct Period {
     #[serde(rename = "resolution")]
     pub resolution: String,
@@ -106,7 +107,7 @@ pub struct Period {
     pub point: Vec<Point>,
 }
 
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Debug, Serialize, Deserialize, ToSchema)]
 pub struct TimeInterval {
     #[serde(rename = "start")]
     pub start: String,
@@ -116,7 +117,7 @@ pub struct TimeInterval {
     pub text: Option<String>,
 }
 
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Debug, Serialize, Deserialize, ToSchema)]
 pub struct Point {
     #[serde(rename = "position")]
     pub position: String,

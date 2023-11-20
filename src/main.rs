@@ -12,13 +12,13 @@ use utoipa::{
     Modify, OpenApi,
 };
 
+use models::*;
 use utoipa_redoc::{Redoc, Servable};
 use utoipa_swagger_ui::SwaggerUi;
 
 pub mod forecast {
     use crate::{
         assets::{DocumentType, ProcessType, PsrType, AREA_CODE},
-        models::GLMarketDocument,
         AppState,
     };
     use axum::extract::{Query, State};
@@ -38,6 +38,13 @@ pub mod forecast {
         pub psr_type: PsrType,
     }
 
+    #[utoipa::path(
+        get,
+        path = "/forecast",
+        responses(
+            (status = 200, description = "Get forecast", body = GLMarketDocument)
+        )
+    )]
     pub async fn forecast(params: Query<Params>, State(state): State<AppState>) -> Json<String> {
         let params: Params = params.0;
         let client = state.entsoe_client;
@@ -68,9 +75,10 @@ async fn main() {
     #[derive(OpenApi)]
     #[openapi(
         paths(
-            hello::world,
+            forecast::forecast,
         ),
         components(
+            schemas(GLMarketDocument, TimePeriodTimeInterval, TimeSeries, Period, Point, TimeInterval, ReceiverMarketParticipantMRID, SenderMarketParticipantMRID, MktPSRType, InBiddingZoneDomainMRID)
         ),
         modifiers(&SecurityAddon),
         tags(
@@ -108,23 +116,4 @@ async fn main() {
         .serve(app.into_make_service())
         .await
         .unwrap();
-}
-
-mod hello {
-    use axum::Json;
-
-    /// List all Todo items
-    ///
-    /// List all Todo items from in-memory storage.
-    #[utoipa::path(
-        get,
-        path = "/world",
-        responses(
-            (status = 200, description = "List all todos successfully", body = [Todo])
-        )
-    )]
-    pub(super) async fn world() -> Json<Vec<String>> {
-        let return_string = "Hello, World!".to_owned();
-        Json(vec![return_string])
-    }
 }
