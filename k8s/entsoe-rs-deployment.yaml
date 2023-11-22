@@ -1,0 +1,29 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: entsoe-rs
+  name: entsoe-rs
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: entsoe-rs
+  strategy: {}
+  template:
+    metadata:
+      labels:
+        app: entsoe-rs
+    spec:
+      containers:
+      - image: emrius11/entsoe-rs:main
+        name: entsoe-rs
+        ports:
+        - containerPort: 3000
+        resources:
+          limits:
+            cpu: "1"
+            memory: "512Mi"
+          requests:
+            cpu: "0.5"
+            memory: "256Mi"
