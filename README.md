@@ -1,6 +1,12 @@
 
 # ENTSOE Transparency API Client
 
+## Docker
+
+```shell
+docker run -v $(pwd)/.env:/app/.env entsoe-rs 
+```
+
 ## Test forecast endpoint with
 
 ```shell

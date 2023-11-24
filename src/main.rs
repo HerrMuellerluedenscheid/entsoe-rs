@@ -6,6 +6,7 @@ pub mod models;
 use axum::{routing::get, Router};
 use dotenvy::dotenv;
 use entsoe::EntsoeClient;
+use tracing::{event, info, span, Level};
 
 use utoipa::{
     openapi::security::{ApiKey, ApiKeyValue, SecurityScheme},
@@ -70,6 +71,12 @@ pub struct AppState {
 
 #[tokio::main]
 async fn main() {
+    let subscriber = tracing_subscriber::fmt::Subscriber::builder();
+    let subscriber = subscriber.with_max_level(tracing::Level::INFO);
+    tracing::subscriber::set_global_default(subscriber.finish())
+        .expect("setting tracing default failed");
+
+    info!("starting server");
     dotenv().unwrap();
 
     #[derive(OpenApi)]

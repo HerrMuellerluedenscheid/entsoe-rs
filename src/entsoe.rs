@@ -8,6 +8,7 @@ use crate::{
 use chrono::{DateTime, Utc};
 use eyre::Result;
 use quick_xml::de::from_str;
+use tracing::{debug, info};
 use url::Url;
 
 type DateType = DateTime<chrono::Utc>;
@@ -124,7 +125,8 @@ impl EntsoeClient {
 
     pub async fn request(self) -> Result<GLMarketDocument> {
         let url = self.get_url();
-        println!("fetch from {}", url);
+        info!("fetching data");
+        debug!("url {}", url);
         let resp = reqwest::get(url).await;
 
         let body = resp.unwrap().text().await?;
