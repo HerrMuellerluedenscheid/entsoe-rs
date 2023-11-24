@@ -76,8 +76,9 @@ async fn main() {
     tracing::subscriber::set_global_default(subscriber.finish())
         .expect("setting tracing default failed");
 
-    info!("starting server");
     dotenv().unwrap();
+    const VERSION: &str = env!("CARGO_PKG_VERSION");
+    info!("starting server version {}", VERSION);
 
     #[derive(OpenApi)]
     #[openapi(
@@ -113,13 +114,16 @@ async fn main() {
     let app = Router::new()
         .merge(SwaggerUi::new("/swagger-ui").url("/api-docs/openapi.json", ApiDoc::openapi()))
         .merge(Redoc::with_url("/redoc", ApiDoc::openapi()))
-        .route("/", get(|| async { "Hello, World!" }))
+        .route(
+            "/",
+            get(|| async { format!("entsoe api wrapper version: {}", VERSION) }),
+        )
         .route("/forecast", get(forecast::forecast))
         .with_state(AppState {
             entsoe_client: EntsoeClient::new(entsoe_api_key),
         });
 
-    axum::Server::bind(&"127.0.0.1:3000".parse().unwrap())
+    axum::Server::bind(&"0.0.0.0:3000".parse().unwrap())
         .serve(app.into_make_service())
         .await
         .unwrap();
