@@ -18,6 +18,7 @@ spec:
       containers:
       - image: emrius11/entsoe-rs:main
         name: entsoe-rs
+        imagePullPolicy: Always
         ports:
         - containerPort: 3000
         resources:

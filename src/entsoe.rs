@@ -221,8 +221,8 @@ mod tests {
     async fn test_fetch_day_ahead() {
         // GET /api?documentType=A69&processType=A01&psrType=B16&in_Domain=10YCZ-CEPS-----N&periodStart=201512312300&periodEnd=201612312300
         dotenv().unwrap();
-        let entsoe_api_key =
-            std::env::var("ENTSOE_API_KEY").expect("ENTSOE_API_KEY is undefined env var");
+        let entsoe_api_key = "default".to_string();
+            // std::env::var("ENTSOE_API_KEY").expect("ENTSOE_API_KEY is undefined env var");
         let client = EntsoeClient::new(entsoe_api_key);
         let start = chrono::Utc
             .with_ymd_and_hms(2015, 12, 30, 23, 0, 0)

@@ -76,7 +76,7 @@ async fn main() {
     tracing::subscriber::set_global_default(subscriber.finish())
         .expect("setting tracing default failed");
 
-    dotenv().unwrap();
+    dotenv().expect(".env file not found");
     const VERSION: &str = env!("CARGO_PKG_VERSION");
     info!("starting server version {}", VERSION);
 
@@ -107,9 +107,9 @@ async fn main() {
             }
         }
     }
-
-    let entsoe_api_key =
-        std::env::var("ENTSOE_API_KEY").expect("ENTSOE_API_KEY is undefined env var");
+    let entsoe_api_key = "api_key";
+    // let entsoe_api_key =
+    //     std::env::var("ENTSOE_API_KEY").expect("ENTSOE_API_KEY is undefined env var");
     // build our application with a single route
     let app = Router::new()
         .merge(SwaggerUi::new("/swagger-ui").url("/api-docs/openapi.json", ApiDoc::openapi()))
@@ -120,7 +120,7 @@ async fn main() {
         )
         .route("/forecast", get(forecast::forecast))
         .with_state(AppState {
-            entsoe_client: EntsoeClient::new(entsoe_api_key),
+            entsoe_client: EntsoeClient::new(entsoe_api_key.to_owned()),
         });
 
     axum::Server::bind(&"0.0.0.0:3000".parse().unwrap())
