@@ -15,10 +15,18 @@ spec:
       labels:
         app: entsoe-rs
     spec:
+      volumes:
+        - name: entsoe-rs-secret
+      secret:
+        secretName: entsoe-rs-secret
       containers:
       - image: emrius11/entsoe-rs:main
         name: entsoe-rs
         imagePullPolicy: Always
+        volumeMounts:
+        - name: entsoe-rs-secret
+          readOnly: true
+          mountPath: "/app/.env"
         ports:
         - containerPort: 3000
         resources:
