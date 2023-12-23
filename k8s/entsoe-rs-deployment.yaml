@@ -26,7 +26,7 @@ spec:
         volumeMounts:
         - name: entsoe-rs-secret
           readOnly: true
-          mountPath: "/app/.env"
+          mountPath: "/app/src/.env"
         ports:
         - containerPort: 3000
         resources:
