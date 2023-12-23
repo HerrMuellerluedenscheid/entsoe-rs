@@ -17,22 +17,22 @@ spec:
     spec:
       volumes:
         - name: entsoe-rs-secret
-      secret:
-        secretName: entsoe-rs-secret
+          secret:
+            secretName: entsoe-rs-secret
       containers:
-      - image: emrius11/entsoe-rs:main
-        name: entsoe-rs
-        imagePullPolicy: Always
-        volumeMounts:
-        - name: entsoe-rs-secret
-          readOnly: true
-          mountPath: "/app/src/.env"
-        ports:
-        - containerPort: 3000
-        resources:
-          limits:
-            cpu: "1"
-            memory: "512Mi"
-          requests:
-            cpu: "0.5"
-            memory: "256Mi"
+        - image: emrius11/entsoe-rs:main
+          name: entsoe-rs
+          imagePullPolicy: Always
+          volumeMounts:
+          - name: entsoe-rs-secret
+            readOnly: true
+            mountPath: "/app/.env"
+          ports:
+          - containerPort: 3000
+          resources:
+            limits:
+              cpu: "1"
+              memory: "512Mi"
+            requests:
+              cpu: "0.5"
+              memory: "256Mi"
