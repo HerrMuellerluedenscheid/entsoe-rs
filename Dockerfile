@@ -14,4 +14,4 @@ RUN apt-get update \
 WORKDIR /app
 COPY --from=builder /entsoe-rs/target/release/entsoe-rs /usr/local/bin/entsoe-rs
 
-# CMD ["/usr/local/bin/entsoe-rs"]
+CMD ["/usr/local/bin/entsoe-rs"]
