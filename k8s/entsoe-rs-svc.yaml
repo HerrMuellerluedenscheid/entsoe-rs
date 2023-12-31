@@ -4,7 +4,7 @@ metadata:
   name: entsoe-service
 spec:
   selector:
-    app.kubernetes.io/name: ensoe-rs
+    app: entsoe-rs
   ports:
     - protocol: TCP
       port: 3000
