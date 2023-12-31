@@ -20,7 +20,7 @@ spec:
           secret:
             secretName: entsoe-rs-secret
       containers:
-        - image: emrius11/entsoe-rs:main
+        - image: emrius11/entsoe-rs:v0.0.1
           name: entsoe-rs
           imagePullPolicy: Always
           volumeMounts:
