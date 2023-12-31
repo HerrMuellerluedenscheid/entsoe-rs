@@ -107,9 +107,8 @@ async fn main() {
             }
         }
     }
-    let entsoe_api_key = "api_key";
-    // let entsoe_api_key =
-    //     std::env::var("ENTSOE_API_KEY").expect("ENTSOE_API_KEY is undefined env var");
+    let entsoe_api_key =
+        std::env::var("ENTSOE_API_KEY").expect("ENTSOE_API_KEY is undefined env var");
     // build our application with a single route
     let app = Router::new()
         .merge(SwaggerUi::new("/swagger-ui").url("/api-docs/openapi.json", ApiDoc::openapi()))
