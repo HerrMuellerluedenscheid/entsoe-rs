@@ -5,10 +5,12 @@ metadata:
   annotations:
     traefik.ingress.kubernetes.io/router.tls: "true"
     traefik.ingress.kubernetes.io/router.tls.certresolver: le
+    cert-manager.io/issuer: "le-http"
 spec:
   tls:
     - hosts:
-        - educk.io
+        - api.educk.io
+      secretName: tls-educk-ingress-http
   rules:
     - host: api.educk.io
       http:

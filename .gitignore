@@ -1,2 +1,4 @@
 /target
 .env
+/k8s/certmanager-issuer.yaml
+/k8s/entsoe-rs-secret.yaml
