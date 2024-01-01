@@ -1,6 +1,13 @@
 
 # ENTSOE Transparency API Client
 
+## Environment Variables
+
+| Variable | Description | Default |
+| --- | --- | --- |
+| ENTSOE_API_KEY | API key for ENTSOE API | |
+| ENTSOE_LOG_LEVEL | Log level for the application | INFO |
+
 ## Docker
 
 ```shell

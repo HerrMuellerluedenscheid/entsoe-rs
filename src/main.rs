@@ -25,6 +25,7 @@ pub mod forecast {
     use axum::extract::{Query, State};
     use axum::Json;
     use chrono::{DateTime, Utc};
+    use log::debug;
     use serde::Deserialize;
 
     type DateType = DateTime<chrono::Utc>;
@@ -59,7 +60,7 @@ pub mod forecast {
             .request()
             .await;
         let as_json = result.map(|x| serde_json::to_string(&x).unwrap()).unwrap();
-        println!("sending bytes {:?}", as_json.len());
+        debug!("sending bytes {:?}", as_json.len());
         Json(as_json)
     }
 }
@@ -71,12 +72,21 @@ pub struct AppState {
 
 #[tokio::main]
 async fn main() {
+    dotenv().expect(".env file not found");
+
+    let log_level = std::env::var("ENTSOE_LOG_LEVEL").unwrap_or("INFO".to_string());
+    let log_level = match log_level.as_str() {
+        "TRACE" => Some(Level::TRACE),
+        "DEBUG" => Some(Level::DEBUG),
+        "INFO" => Some(Level::INFO),
+        "WARN" => Some(Level::WARN),
+        "ERROR" => Some(Level::ERROR),
+        _ => None,
+    };
     let subscriber = tracing_subscriber::fmt::Subscriber::builder();
-    let subscriber = subscriber.with_max_level(tracing::Level::INFO);
+    let subscriber = subscriber.with_max_level(log_level.unwrap());
     tracing::subscriber::set_global_default(subscriber.finish())
         .expect("setting tracing default failed");
-
-    dotenv().expect(".env file not found");
     const VERSION: &str = env!("CARGO_PKG_VERSION");
     info!("starting server version {}", VERSION);
 
