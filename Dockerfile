@@ -6,10 +6,10 @@ COPY . .
 RUN cargo build --release
 
 FROM debian:bullseye-slim
-RUN apt-get update \
-    & apt-get install -y extra-runtime-dependencies ca-certificates \
-    & apt-get clean \
-    & rm -rf /var/lib/apt/lists/*
+RUN apt-get update -y \
+    && apt-get install -y ca-certificates \
+    && apt-get clean \
+    && rm -rf /var/lib/apt/lists/*
 
 WORKDIR /app
 COPY --from=builder /entsoe-rs/target/release/entsoe-rs /usr/local/bin/entsoe-rs
