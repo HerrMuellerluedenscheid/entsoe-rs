@@ -17,6 +17,8 @@ use models::*;
 use utoipa_redoc::{Redoc, Servable};
 use utoipa_swagger_ui::SwaggerUi;
 
+use git_version::git_version;
+
 pub mod forecast {
     use crate::{
         assets::{DocumentType, ProcessType, PsrType, AREA_CODE},
@@ -87,8 +89,8 @@ async fn main() {
     let subscriber = subscriber.with_max_level(log_level.unwrap());
     tracing::subscriber::set_global_default(subscriber.finish())
         .expect("setting tracing default failed");
-    const VERSION: &str = env!("CARGO_PKG_VERSION");
-    info!("starting server version {}", VERSION);
+    const VERSION: &str = git_version!();
+    info!("starting server version {}", &VERSION);
 
     #[derive(OpenApi)]
     #[openapi(
