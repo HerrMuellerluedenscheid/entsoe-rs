@@ -31,8 +31,9 @@ pub mod forecast {
     use serde::Deserialize;
 
     type DateType = DateTime<chrono::Utc>;
+    use utoipa::IntoParams;
 
-    #[derive(Debug, Deserialize, Clone)]
+    #[derive(IntoParams, Debug, Deserialize, Clone)]
     pub struct Params {
         pub period_start: DateType,
         pub period_end: DateType,
@@ -44,6 +45,7 @@ pub mod forecast {
 
     #[utoipa::path(
         get,
+        params(Params),
         path = "/forecast",
         responses(
             (status = 200, description = "Get forecast", body = GLMarketDocument)
